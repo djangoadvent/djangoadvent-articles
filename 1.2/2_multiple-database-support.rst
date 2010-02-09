@@ -22,7 +22,7 @@ settings like:
 
 .. sourcecode:: python
 
-    DATABASE_ENGINE = "psycopg2"
+    DATABASE_ENGINE = "postgresql_psycopg2"
     DATABASE_NAME = "my_big_project"
     DATABASE_USER = "mario"
     DATABASE_PASSWORD = "princess_peach"
@@ -33,7 +33,7 @@ You instead write something like:
 
     DATABASES = {
         "default": {
-            "ENGINE": "django.db.backends.psycopg2",
+            "ENGINE": "django.db.backends.postgresql_psycopg2",
             "NAME": "my_big_project",
             "USER": "mario",
             "PASSWORD": "princess_peach",
