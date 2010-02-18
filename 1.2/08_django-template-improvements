@@ -1,0 +1,98 @@
+:Author:
+	Alex Gaynor
+
+############################
+Django Template Improvements
+############################
+
+__init__
+========
+
+Almost every request to your Django site renders a template.  Django handles
+these pretty snapilly -- after all it's not so expensive to load the template
+file and compile it before rendering it each request.  But what happens if your
+site renders hundreds of templates per request?  If you're rendering 500
+templates per request, even if they only take one millisecond each you've added
+half a second of overhead to each request.  It turns out this is exactly the
+problem the developers at TypePad encountered when developing their Motion
+software.  The result of this was a set of improvements to the templating
+system to allow for caching of compiled template objects, however this set of
+improvements also makes the template loader system more flexible in a few other
+ways.
+
+Caching
+=======
+
+The most obvious improvement `changeset 11862
+<http://code.djangoproject.com/changeset/11862>`_ brings is the inclusion of a
+new cached template loader.  This loader is instantiated with a list of other
+template loaders, and then it loads templates using those loaders, but caching
+the compiled template objects.  This is helpful because, previously, the
+template was reparsed and compiled on each render.  If you were rendering a lot
+of templates on each request (such as including another template inside of a
+loop) this could incur a lot of overhead.  
+
+If you want to update your site to take advantage of this loader it's just a
+matter of changing your settings to use this new loader.  The cached template
+loader is a class-based loader that you configure with a list of other loaders
+that it should wrap. The wrapped loaders are used to locate unknown templates
+when they are first encountered.  The cached loader then stores the compiled
+``Template`` in memory. The cached ``Template`` instance is returned for
+subsequent requests to load the same template.
+
+For example, to enable template caching with the ``filesystem`` and
+``app_directories`` template loaders you might use the following settings:
+
+.. sourcecode:: python
+
+    TEMPLATE_LOADERS = (
+        ('django.template.loaders.cached.Loader', (
+            'django.template.loaders.filesystem.Loader',
+            'django.template.loaders.app_directories.Loader',
+        )),
+    )
+
+Caveats
+=======
+
+Most environments that Django is deployed in use multiple threads to serve
+Django requests.  This presented one of the major challenges to supporting
+cached templates in Django.  This is because a cached template means it could
+be used used from multiple threads simultaneously.  Before this patch landed,
+Django template objects were not thread safe, rendering the same template
+object from multiple threads could produce incorrect results.  However, with
+this patch, Django's template objects became threadsafe, including all of the
+builtin template tags (specifically ``{% block %}`` and ``{% cycle %}``).
+
+Before it is safe to use the cached template loader with your own applications
+you need to make sure that all of your custom template tags are threadsafe.
+Fortunately the Django documentation provides an excellent guide on `thread
+safety considerations
+<http://docs.djangoproject.com/en/dev/howto/custom-template-tags/#thread-safety-considerations>`_.
+
+Bonus
+=====
+
+Previously, template loaders were required to return the string of the
+template, rather than the template object.  This was another problem the
+aforementioned patch solved.  This was a problem because the entire point of a
+cached template loader is that it returns a precompiled template object.
+Therefore this patch allows template loaders to return template objects [#]_.
+However, this also allows one to build a template loader that works with other
+template languages (such as Jinja, Cheeta, Mako, or any other language that
+works by taking a string and a dictionary).  Before if you wanted to use
+another template language with Django you either had to monkey patch Django
+extensively, or replace every call to something like ``render_to_response()``
+with your own function that used your alternate template language.  Now, in
+Django 1.2, all you need to do is write a template loader with a
+``load_template()`` method that returns a template object.
+
+Conclusion
+==========
+
+This patch provides several important improvements to Django's templating
+systems' performance and flexibility.  As always the documentation is an
+excellent resource when it comes to taking advantage of these features of the
+templating system.
+
+.. [#] Defined as something with a ``render()`` method.
