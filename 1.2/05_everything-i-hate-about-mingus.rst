@@ -50,7 +50,7 @@ takes to get started:
     pip install -r stable-requirements.txt
     cp local_settings.py.template local_settings.py
     ./manage.py syncdb
-    ./manage.py loaddata fixtures/test_data.json
+    ./manage.py loaddata test_data.json
     ./manage.py runserver
 
 For those not familiar, the above commands `mkvirtualenv`, `workon`, and
@@ -335,7 +335,7 @@ example landing.html:
 
 .. sourcecode:: html+django
 
-    {% load trans %}
+    {% load i18n %}
 
     <h4>{% trans "Blog roll" %}</h4>
 
