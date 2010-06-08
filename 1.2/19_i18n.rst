@@ -1,0 +1,306 @@
+:Author:
+	Jannis Leidel
+
+######################
+i18n/l10n Improvements
+######################
+
+Django 1.2 comes with a bunch of improvements for the internationalization and
+localization machinery, some of which I'd like to introduce here briefly.
+
+Formats
+=======
+
+Until 1.2, Django had limited support for handling form input and
+displaying model data for locales other than US-English. Try to display a
+datetime value in the format appropriate to your site's locale (e.g. decimal
+and thousand separators) and you'd soon discover you were out of luck.
+
+Even though Django can handle strings and a few technical messages (e.g.
+``DATETIME_FORMAT``), it requires the use of 3rd party tools like the
+(fabulous) Babel_ to create fully localized sites.
+
+Thankfully, `Marc Garcia`_ worked on that problem during his
+`Summer of Code`_ in 2009 and laid the foundations for Django's own
+formatting engine, which can handle input and output based on the `currently
+active language`_. Among other features, this includes transparent support for
+the admin widgets and the template tags (e.g. ``{% date %}``). For example,
+with the German locale activated, datetime fields are rendered in the admin
+like this:
+
+.. image:: http://djangoadvent.s3.amazonaws.com/advent/003/admin1.png
+    :align: center
+    :alt: datetime field rendered in admin with German locale 
+
+Note how the datetime fields are actually rendered with a format common in
+Germany, ``30.03.2010`` instead of ``03/30/2010``.
+
+The same applies to numeric fields, e.g. a DecimalField formatted with decimal
+and thousands separators:
+
+.. image:: http://djangoadvent.s3.amazonaws.com/advent/003/admin2.png
+    :align: center
+    :alt: datetime field rendered in admin with German locale 
+
+.. _Babel: http://babel.edgewall.org/
+.. _`Marc Garcia`: http://vaig.be/
+.. _`currently active language`: http://docs.djangoproject.com/en/1.1/topics/i18n/deployment/#how-django-discovers-language-preference
+.. _`Summer of Code`: http://vaig.be/2009/04/gsoc-implementation-of-additional-i18n.html
+
+Custom formats
+--------------
+
+Django provides format definitions for many locales based on imported data
+from the CLDR_ (Unicode Common Locale Data Repository), but sometimes you
+might want to create your own, because a format file doesn't exist for your
+locale, or because you want to overwrite some of the values.
+
+To use custom formats, specify the path where you'll place format files by
+setting ``FORMAT_MODULE_PATH`` to the Python path where format files will
+exists.
+
+The format files are not placed directly in this directory, but in a
+subdirectory with the name of the locale, and they must be named
+``formats.py``.
+
+To customize the English formats in your project ``mysite``, set
+``FORMAT_MODULE_PATH`` to ``mysite.formats``` and create a dictory structure
+like this::
+
+    mysite/
+        formats/
+            __init__.py
+            en/
+                __init__.py
+                formats.py
+
+.. _CLDR: http://cldr.unicode.org/
+
+Available formats
+-----------------
+
+You are probably already familiar with some of the formats because they
+were avaibable in earlier Django releases but haven't been hooked up with a
+formatting mechanism.
+
+Valid `format strings`_ in the date and time formats below are of the same format
+as the ``{% now %}`` template tag.
+
+.. _format strings: http://docs.djangoproject.com/en/dev/ref/templates/builtins/#ttag-now
+
+Formatting
+##########
+
+``DATE_FORMAT``
+
+    :Default: ``'N j, Y'`` (e.g. Feb. 15, 2010)
+
+    Default formatting of date fields.
+
+``TIME_FORMAT``
+
+    :Default: ``'P'`` (e.g. 4 p.m.)
+
+    Default formatting of time fields.
+
+``DATETIME_FORMAT``
+
+    :Default: ``'N j, Y, P'`` (e.g. Feb. 15, 2010, 4 p.m.)
+
+    Default formatting of datetime fields.
+
+``YEAR_MONTH_FORMAT``
+
+    :Default: ``'F Y'`` (e.g. February 2010)
+
+    Default formatting of date fields, displaying only year and month.
+    Used in the admin changelist, et al.
+
+``MONTH_DAY_FORMAT``
+
+    :Default: ``'F j'`` (e.g. February 15)
+
+    Default formatting of date fields, only displaying month and day.
+    Used in the admin changelist, et al.
+
+``SHORT_DATE_FORMAT``
+
+    :Default: ``'m/d/Y'`` (e.g. 02/15/2010)
+
+    A short formatting of date fields.
+
+``SHORT_DATETIME_FORMAT``
+
+    :Default: ``'m/d/Y P'`` (e.g. 02/15/2010 4 p.m.)
+
+    A short formatting of datetime fields.
+
+``FIRST_DAY_OF_WEEK``
+
+    :Default: ``0`` (Sunday)
+
+    Number representing the first day of the week. Used in the admin calendar
+    widget.
+
+``DECIMAL_SEPARATOR``
+
+    :Default: ``'.'`` (Dot)
+
+    Default decimal separator used when formatting decimal numbers.
+
+``THOUSAND_SEPARATOR``
+
+    :Default: ``','`` (Comma)
+
+    Default thousands separator used when formatting numbers.
+
+``NUMBER_GROUPING``
+
+    :Default: ``0``
+
+    Number of digits grouped together on the integer part of a number. Common
+    use is to display a thousands separator. If this setting is 0, then, no
+    grouping will be applied to the number. If this setting is greater than 0
+    then the setting ``THOUSAND_SEPARATOR`` will be used as the separator
+    between those groups.
+
+.. note::
+
+    If enabled, the English locale has a default of 3.
+
+Handling input
+##############
+
+There are three separate format strings that will be accepted when inputting
+data on a date, time or datetime field. Formats will be tried in order, using
+the first valid match. These format strings are specified in `Python's datetime`_
+module syntax, which is different from the one used by Django for formatting
+dates to be displayed.
+
+Use ``DATE_INPUT_FORMATS`` for date fields, ``TIME_INPUT_FORMATS``, for time
+fields and ``DATETIME_INPUT_FORMATS`` for datetime fields.
+
+Also, have a look at the `English format file`_ to see the default values.
+
+.. _`Python's datetime`: http://docs.python.org/library/datetime.html#strftime-behavior
+.. _`English format file`: http://code.djangoproject.com/browser/django/trunk/django/conf/locale/en/formats.py
+
+Smaller bugfixes worth noting
+=============================
+
+The ``makemessages`` command
+----------------------------
+
+``--ignore``
+############
+
+The ``makemessages`` command now features a ``--ignore`` option. It allows
+you to specify a glob pattern of paths it should ignore while traversing the
+filesystem in search of marked strings. This is most useful if you have a bunch
+of apps in your "project" directory that you don't want to translate in a
+monolithic project wide translation catalog but inside their own directories.
+
+A simple example that will conveniently ignore all directories in the ``app``
+directory
+
+.. sourcecode:: bash
+
+    $ [path/to/myproject] django-admin.py makemessages -l de --ignore=apps/*
+
+``--symlinks``
+##############
+
+Additionally to the ``--ignore`` option there is now a ``--symlinks`` option,
+that will tell ``makemessages`` to follow symlinks on its quest to find files
+containing strings marked for translation -- very useful if you keep your
+apps or templates in a central filesystem location.
+
+Plural forms
+------------
+
+The plural forms of the default Django translations are now automatically
+copied to newly created translation files (`changeset 12445`_).
+
+.. _`changeset 12445`: http://code.djangoproject.com/changeset/12445
+
+Order of precedence of translation catalogs
+-------------------------------------------
+
+`r12447`_ fixed a bug in Django that prevented translation catalogs
+located in the "project" directory from sucessfully overriding translations
+stored in apps.
+
+.. _`r12447`: http://code.djangoproject.com/changeset/12447
+
+Template filter in ``{% trans %}``
+----------------------------------
+
+`r12472`_ introduced support for template filters in the ``trans``
+template tag. The filters will be applied to the result of the translation, e.g.
+
+.. sourcecode:: html+django
+
+    {% load i18n %}
+
+    <h1>{% trans "Welcome!"|upper %}</h1>
+
+Suppose the locale is set to French the template would be rendered as
+
+.. sourcecode:: html
+
+    <h1>BIENVENUE!</h1>
+
+.. _`r12472`: http://code.djangoproject.com/changeset/12472
+
+Support for IDN (Internationalized Domain Names)
+------------------------------------------------
+
+Internationlized Domain Names are domain names that contain characters in a
+language-specific script, like Chinese or the Latin-based languages with
+diacritics, such as French, that are encoded with Unicode and saved in the
+Domain Name System as ASCII strings using the Punycode_ transcription. [#]_
+
+URLField and EMailField got support for IDNs in r12474_ and
+r12620_ and can now handle domains like `http://新宿駅.jp`_ and
+`http://räksmörgås.josefsson.org`_.
+
+.. _`http://新宿駅.jp`: http://新宿駅.jp/
+.. _`http://räksmörgås.josefsson.org`: http://räksmörgås.josefsson.org/
+.. _Punycode: http://en.wikipedia.org/wiki/Punycode
+.. _r12474: http://code.djangoproject.com/changeset/12474
+.. _r12620: http://code.djangoproject.com/changeset/12620
+
+Current locale in cache
+-----------------------
+
+When the internationalization mechanism is enabled (if the ``USE_I18N`` setting
+is ``True``), Django will append the currently selected language (e.g. ``en-us``)
+to the generated cache key, making it easier for multilingual sites to use the
+`cache middleware`_ and decorator_ (r12546_ and r12624_).
+
+.. _r12546: http://code.djangoproject.com/changeset/12546
+.. _r12624: http://code.djangoproject.com/changeset/12624
+.. _`cache middleware`: http://docs.djangoproject.com/en/dev/topics/cache/#the-per-site-cache
+.. _decorator: http://docs.djangoproject.com/en/dev/topics/cache/#the-per-view-cache
+
+First day of week
+-----------------
+
+The admin calendar widget now automatically looks up the first day of the week
+in the format modules before rendering. In the ``formats.py`` simply set
+``FIRST_DAY_OF_WEEK`` in ``formats.py`` to a value from 0 to 6, where 0 means
+Sunday, 1 means Monday, and so forth.
+
+Internationalization/localization documentation
+-----------------------------------------------
+
+Luckily, Ramiro Morales refactored the internationalization and localization
+documentation (r12440_), so have a look at the `new i18n landing page`_
+to learn more about the intricacies of internationalization.
+
+.. _`new i18n landing page`: http://docs.djangoproject.com/en/dev/topics/i18n/
+.. _r12440: http://code.djangoproject.com/changeset/12440
+
+
+.. [#] http://en.wikipedia.org/wiki/Internationalized_domain_name
+
