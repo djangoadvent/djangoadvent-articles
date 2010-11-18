@@ -1,0 +1,31 @@
+##################
+Article Guidelines
+##################
+
+* Articles should be submitted in ReST (ReStructured Text) format — easy to
+  write, easy to process, and easy for Django to incorporate into the
+  Django documentation. There's a sample file called "ARTICLE_SKELETON.rst"
+  in this directory which shows off our preferred formatting conventions.
+  If ReST is a problem for you, don't worry. Ultimately, any article format
+  you choose to submit is OK.
+
+* Each article will be accompanied by a roughly 100-word bio, photo,
+  and URL. Please send us your favorite headshot in addition to your bio
+  when you submit your article. URLs in the bio are welcome; please keep
+  it tasteful and remember that this resource may be around awhile. It's
+  ok (and encouraged!) to promote yourself, your company, and your cool
+  projects in your bio.
+  
+  If you already submitted your bio / headshot last year and don't want to
+  update it, that's fine.
+
+* If you plan to include some interesting media with your article,
+  please get in touch with us so we can work out a solution. Large
+  images, many images, or non-image media qualify as "interesting".
+
+Thanks!
+
+Your Hosts,
+
+Rob Hudson (rob@cogit8.org)
+and Idan Gazit (idan@gazit.me)
