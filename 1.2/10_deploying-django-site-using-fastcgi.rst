@@ -65,8 +65,10 @@ failure or server restart.  To install daemontools, type:
 
 Unfortunately, the package for daemontools in Ubuntu could use a bit of work,
 so we have to do a bit more ourselves to finish the installation so that it 
-automatically runs at boot time.  First, create a file at 
-``/etc/event.d/svscanboot`` with these contents:
+automatically runs at boot time.
+
+If you're running an older version of Ubuntu (before 9.10), you'll want to
+create a file at ``/etc/event.d/svscanboot`` with these contents:
 
 .. sourcecode:: sh
 
@@ -80,6 +82,22 @@ automatically runs at boot time.  First, create a file at
     stop on runlevel 6
  
     respawn
+    exec /usr/bin/svscanboot
+
+If you're running a newer installation of Ubuntu, however, you'll want to
+create a file at ``/etc/init/svscanboot.conf`` with these contents:
+
+.. sourcecode:: sh
+
+    # svscanboot - Start up daemontools
+
+    description    "Start up daemontools"
+
+    start on runlevel [2345]
+    stop on runlevel [!2345]
+
+    respawn
+
     exec /usr/bin/svscanboot
 
 Now make a directory at ``/etc/service`` by running this command:
