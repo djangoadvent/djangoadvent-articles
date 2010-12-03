@@ -62,10 +62,12 @@ nullable::
         favorite_cheese = models.ForeignKey("Cheese", null=True)
 
 Now what happens if we delete a cheesemaker's favorite cheese? The cheesemaker
-gets deleted too, and all of their cheeses with them. Probably not what we
-want. Instead, we'd like to be able to tell Django: "if I delete a
-cheesemaker's favorite cheese, just set their favorite_cheese to NULL/None."
-And in Django 1.3, we can now do exactly that::
+gets deleted too, and all of their cheeses with them. Oops; probably not what we
+want.
+
+Instead, we'd like to be able to tell Django: "if I delete a cheesemaker's
+favorite cheese, just set their favorite_cheese to NULL/None."  And in Django
+1.3, we can now do exactly that::
 
     class Cheesemaker(models.Model):
         name = models.CharField(max_length=100)
@@ -145,17 +147,22 @@ ForeignKey. Just like a `SET_NULL`_ ForeignKey must be ``null=True``, a
    all sorts of troubles.
 
 You guessed it: I'm going to try this one out on our poor confused
-cheesemakers. Some of them have objected to being forced to choose a favorite,
-so we're going to give them a default::
+cheesemakers. We're going to specify a region for each cheesemaker; we'll say
+most of our cheesemakers happen to come from western Switzerland, so we'll make
+the Emmental the default region::
 
-    def get_default_favorite_cheese():
-        return Cheese.objects.get_or_create(name="Emmentaler")[0]
+    def get_default_region():
+        return Region.objects.get_or_create(name="Emmental")[0]
+
+    class Region(models.Model):
+        name = models.CharField(max_length=100)
 
     class Cheesemaker(models.Model):
         name = models.CharField(max_length=100)
-        favorite_cheese = models.ForeignKey(
-            "Cheese", default=get_default_favorite_cheese,
-             on_delete=models.SET_DEFAULT)
+        region = models.ForeignKey(Region, default=get_default_region,
+                                   on_delete=models.SET_DEFAULT)
+
+Now if we delete a Cheesemaker's region, they'll revert to Emmental.
 
 SET()
 -----
@@ -223,10 +230,18 @@ cascade yet. So we need to add some `initial SQL`_ in the
 named "cheese" as well)::
 
     ALTER TABLE "cheese_cheese"
-        ALTER COLUMN "maker"
-            REFERENCES "cheese_cheesemaker"
-                DEFERRABLE INITIALLY DEFERRED
-                ON DELETE CASCADE;
+        DROP CONSTRAINT "cheese_cheese_maker_id_fkey";
+
+    ALTER TABLE "cheese_cheese"
+        ADD CONSTRAINT "cheese_cheese_maker_id_fkey"
+            FOREIGN KEY ("maker_id")
+            REFERENCES "cheese_cheesemaker" ("id")
+                ON DELETE CASCADE
+                DEFERRABLE INITIALLY DEFERRED;
+
+(In order to know the name of the constraint to drop, I just checked the table
+schema in the Postgres shell. If you're planning to use this feature, you
+probably already know how to do that for your database.)
 
 If we drop our database and re-sync it with this added initial SQL, Postgres
 will now handle the cascade deletions from cheesemaker to cheese.
@@ -270,7 +285,7 @@ be. Previously, relationships were followed separately and a separate query
 performed on the related table for each individual object to be deleted. Now, relationships are followed per-model, and only one bulk query is performed on each related table.
 
 For example, in Django 1.2 if you had 100 cheesemakers in your database and
-called ``CheeseMaker.objects.all().delete()``, Django would do 100 separate
+called ``Cheesemaker.objects.all().delete()``, Django would do 100 separate
 queries on the ``Cheese`` table to look for cheeses related to each one of
 those cheesemakers. In Django 1.3, it will do a single bulk query on the cheese
 table.
