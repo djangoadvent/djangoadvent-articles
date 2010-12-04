@@ -239,9 +239,10 @@ named "cheese" as well)::
                 ON DELETE CASCADE
                 DEFERRABLE INITIALLY DEFERRED;
 
-(In order to know the name of the constraint to drop, I just checked the table
-schema in the Postgres shell. If you're planning to use this feature, you
-probably already know how to do that for your database.)
+(In order to know the name of the constraint to drop and recreate, and the full
+syntax for recreating it, I just checked the table schema in the Postgres
+shell. If you're planning to use this feature, you probably already know how to
+do that for your database.)
 
 If we drop our database and re-sync it with this added initial SQL, Postgres
 will now handle the cascade deletions from cheesemaker to cheese.
@@ -282,7 +283,9 @@ Improved performance
 One nice side-effect of the new cascade-deletion code is that bulk-deletion of
 objects referenced by ForeignKeys is much more efficient than it used to
 be. Previously, relationships were followed separately and a separate query
-performed on the related table for each individual object to be deleted. Now, relationships are followed per-model, and only one bulk query is performed on each related table.
+performed on the related table for each individual object to be deleted. Now,
+relationships are followed per-model, and only one bulk query is performed on
+each related table.
 
 For example, in Django 1.2 if you had 100 cheesemakers in your database and
 called ``Cheesemaker.objects.all().delete()``, Django would do 100 separate
