@@ -8,10 +8,10 @@ Delete This
 ..
 
     "Django's a web framework, not a deletion framework."  -- Malcolm
-    Tredinnick, DjangoCon 2010, hallway track
+    Tredinnick, DjangoCon 2010, hallway track [#]_
 
 Nevertheless, we web developers still find ourselves needing to delete
-things. [#]_
+things.
 
 Once in a while, someone new to Django discovers that ForeignKeys (even with
 ``null=True``) are cascade-deleted by the Django ORM. Sometimes this makes them
@@ -25,8 +25,8 @@ cascade, or not, or set null, or whatever you want them to do on delete.
 So be forewarned: the next time you delete half of your production database,
 there'll be one less excuse for it.
 
-.. [#] Double points for a quote reconstructed from memory and taken out of
-   context (but used with permission). If my memory serves, Malcolm was
+.. [#] Double points for a quote both reconstructed from memory and taken out
+   of context (but used with permission). If memory serves, Malcolm was
    discussing bulk-deletion performance at the time, not customizing
    cascade-delete. Of course, in the process we've `fixed the performance
    issue, too`_.
@@ -180,7 +180,7 @@ authentication, that means a OneToOneField to
 Easy enough -- but wait. By now we're well attuned to the risks of the default
 cascade deletion; if somebody should happen to delete a User, do we really want
 that cheesemaker and all their cheeses to disappear into the ether? I dare say
-we don't::
+we do not::
 
     from django.contrib.auth.models import User
 
@@ -193,8 +193,9 @@ we don't::
                                     on_delete=models.SET(get_sentinel_user))
 
 Now if we delete a cheesemaker's user, that cheesemaker will be re-associated
-with a special ``User`` object with the username "deleted". (Yes, ``on_delete``
-works with ``OneToOneField`` as well as ``ForeignKey``.)
+with a special ``User`` object with the username "deleted".
+
+(Yes, ``on_delete`` works with ``OneToOneField`` as well as ``ForeignKey``.)
 
 DO_NOTHING
 ----------
@@ -224,8 +225,13 @@ database to handle it (I'll assume we're using `PostgreSQL`_)::
         maker = models.ForeignKey(Cheesemaker, on_delete=models.DO_NOTHING)
 
 With just this change, deleting a cheesemaker will cause an ``IntegrityError``:
-we've asked Django not to cascade, but we haven't yet told Postgres. So we need
-to add some `initial SQL`_ in the ``sql/cheese.postgresql_psycopg2.sql`` file
+we've asked Django not to cascade, but we haven't yet told Postgres to do
+it.
+
+We could connect to our database shell and manually alter the table schema to
+add the ``ON DELETE`` clause, but then we'd have to remember to do that every
+time we ``syncdb`` a fresh database: yuck. Instead, let's make it automatic by
+adding some `initial SQL`_ in the ``sql/cheese.postgresql_psycopg2.sql`` file
 in our app (presuming our app is named "cheese" as well)::
 
     ALTER TABLE "cheese_cheese"
@@ -240,8 +246,8 @@ in our app (presuming our app is named "cheese" as well)::
 
 (In order to know the name of the constraint to drop and recreate, and the full
 syntax for recreating it, I just checked the table schema in the Postgres
-shell. If you're planning to use this feature, you probably already know how to
-do that for your database.)
+shell. If you're planning to use the ``DO_NOTHING`` option, you should probably
+already be on good terms with your particular database and SQL syntax.)
 
 If we drop our database and re-sync it with this added initial SQL, Postgres
 will now handle the cascade deletions from cheesemaker to cheese.
@@ -258,12 +264,11 @@ will now handle the cascade deletions from cheesemaker to cheese.
 Write your own
 --------------
 
-This isn't officially an option (it's not documented), but if you examine the
+This isn't officially an option (it's not documented), but if you peruse the
 source code for all of the above ``on_delete`` options, you'll notice that they
 are just functions which share a common signature. With a bit of examination of
-how the built-in functions work, you could write your own custom function and
-pass it to ``on_delete`` to define just about any on-delete behavior you can
-dream up.
+the built-in functions, you could write your own custom function and pass it to
+``on_delete`` to define just about any on-delete behavior you can dream up.
 
 .. warning::
 
@@ -273,8 +278,8 @@ dream up.
    guarantee for this API: if you write a custom ``on_delete`` function, future
    Django versions might break it.
 
-Other benefits
-==============
+Side benefits
+=============
 
 Improved performance
 --------------------
