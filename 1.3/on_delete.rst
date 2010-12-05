@@ -8,27 +8,28 @@ Delete This
 ..
 
     "Django's a web framework, not a deletion framework."  -- Malcolm
-    Tredinnick, DjangoCon 2010
+    Tredinnick, DjangoCon 2010, hallway track
 
-Nevertheless, we web-developers still find ourselves needing to delete things
-now and again. [#]_ 
+Nevertheless, we web developers still find ourselves needing to delete
+things. [#]_
 
-And once in a while, someone new to Django discovers that ForeignKeys (even
-with ``null=True``) are cascade-deleted by the Django ORM. Sometimes this makes
-them sad. Or angry.  Especially if they happen to discover this while making,
-you know, "just a quick tweak" to the production database (pro tip: don't do
-that).
+Once in a while, someone new to Django discovers that ForeignKeys (even with
+``null=True``) are cascade-deleted by the Django ORM. Sometimes this makes them
+sad. Or angry.  Especially if they happen to discover this while making, you
+know, "just a quick tweak" to the production database (pro tip: don't do that).
 
 Thanks to some `excellent patches`_ submitted by Michael Glassford and Johannes
 Dollinger, we've fixed that for Django 1.3. Now you can make ForeignKeys
-cascade, or not, or set null, or whatever you want them to do on delete. So be
-forewarned: the next time you screw up your production database, there'll be
-one less good excuse for it.
+cascade, or not, or set null, or whatever you want them to do on delete.
 
-.. [#] Yeah, this quote's a little bit out of context. Malcolm was actually
-   talking about bulk-deletion performance at the time, not customizing
-   delete-cascade. Of course, in the process we `fixed the performance issue,
-   too`_.
+So be forewarned: the next time you delete half of your production database,
+there'll be one less good excuse for it.
+
+.. [#] Double points for a quote reconstructed from memory and taken out of
+   context (but used with permission). If my memory serves, Malcolm was
+   discussing about bulk-deletion performance at the time, not customizing
+   cascade-delete. Of course, in the process we've `fixed the performance
+   issue, too`_.
 
 .. _excellent patches: http://code.djangoproject.com/ticket/7539
 
