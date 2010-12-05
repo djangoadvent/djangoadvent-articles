@@ -23,11 +23,11 @@ Dollinger, we've fixed that for Django 1.3. Now you can make ForeignKeys
 cascade, or not, or set null, or whatever you want them to do on delete.
 
 So be forewarned: the next time you delete half of your production database,
-there'll be one less good excuse for it.
+there'll be one less excuse for it.
 
 .. [#] Double points for a quote reconstructed from memory and taken out of
    context (but used with permission). If my memory serves, Malcolm was
-   discussing about bulk-deletion performance at the time, not customizing
+   discussing bulk-deletion performance at the time, not customizing
    cascade-delete. Of course, in the process we've `fixed the performance
    issue, too`_.
 
@@ -39,8 +39,8 @@ What exactly is the problem here?
 =================================
 
 Let's back up. Say you've got models named ``Cheesemaker`` and ``Cheese``. And
-of course ``Cheese`` has a ``ForeignKey`` to ``Cheesemaker``, because cheese
-doesn't grow on trees. So it looks like this::
+of course ``Cheese`` has a ``ForeignKey`` to ``Cheesemaker``, because cheeses
+don't grow on trees. So it looks like this::
 
     from django.db import models
 
@@ -63,8 +63,8 @@ nullable::
         favorite_cheese = models.ForeignKey("Cheese", null=True)
 
 Now what happens if we delete a cheesemaker's favorite cheese? The cheesemaker
-gets deleted too, and all of their cheeses with them. Oops; probably not what we
-want.
+gets deleted too, and all of their cheeses with them. Oops; that's probably not
+what we want.
 
 Instead, we'd like to be able to tell Django: "if I delete a cheesemaker's
 favorite cheese, just set their favorite_cheese to NULL/None."  And in Django
@@ -95,16 +95,15 @@ you.
 CASCADE
 -------
 
-This is the default value for ``on_delete``, to maintain backwards
-compatibility with previous versions of Django, so there's probably no reason
-you'd ever need to set it (though you can, if you want an explicit reminder in
-the code).
+This is the default value for ``on_delete`` to maintain backwards compatibility
+with previous versions of Django, so there's probably no reason you'd ever need
+to set it (though you can, if you want an explicit reminder in the code).
 
 .. note::
 
-   Unfortunately, due to backwards-compatibility constraints, ``CASCADE`` has
-   to remain the default for all ForeignKeys. In an ideal world the default for
-   nullable ForeignKeys would probably be `SET_NULL`_.
+   Unfortunately, backwards-compatibility means ``CASCADE`` has to remain the
+   default for all ForeignKeys. In an ideal world the default for nullable
+   ForeignKeys would probably be `SET_NULL`_.
 
 PROTECT
 -------
@@ -200,14 +199,14 @@ works with ``OneToOneField`` as well as ``ForeignKey``.)
 DO_NOTHING
 ----------
 
-You may be wondering why Django reimplements all of this at the ORM layer, when
+You may be wondering why Django implements all of this at the ORM layer, when
 any SQL database worth its salt already supports ON DELETE clauses in table
-definitions. And you're perfectly right to wonder. Django's ORM has to support
-a variety of database backends, including some (MySQL ISAM) that don't support
-referential integrity or cascade. Implementing cascade behaviors at the ORM
-level allows Django code using ``on_delete`` to be portable to these databases,
-and also allows additional flexibility (such as the `SET()`_ and `Write your
-own`_ options).
+definitions. The problem is, Django's ORM has to support a variety of database
+backends, including some (MySQL ISAM) that don't support referential integrity
+or cascade at all. Implementing cascade behaviors at the ORM level allows
+Django code using ``on_delete`` to be portable to these databases, and also
+allows additional flexibility (such as the `SET()`_ and `Write your own`_
+options).
 
 But all is not lost for the SQL purists among us! If you want to leave
 cascade-handling entirely in the hands of your database, just use the
@@ -224,11 +223,10 @@ database to handle it (I'll assume we're using `PostgreSQL`_)::
         name = models.CharField(max_length=100)
         maker = models.ForeignKey(Cheesemaker, on_delete=models.DO_NOTHING)
 
-With just this, deleting a cheesemaker will cause an ``IntegrityError``,
-because we've asked Django not to cascade, but we haven't told Postgres to
-cascade yet. So we need to add some `initial SQL`_ in the
-``sql/cheese.postgresql_psycopg2.sql`` file in our app (presuming our app is
-named "cheese" as well)::
+With just this change, deleting a cheesemaker will cause an ``IntegrityError``:
+we've asked Django not to cascade, but we haven't yet told Postgres. So we need
+to add some `initial SQL`_ in the ``sql/cheese.postgresql_psycopg2.sql`` file
+in our app (presuming our app is named "cheese" as well)::
 
     ALTER TABLE "cheese_cheese"
         DROP CONSTRAINT "cheese_cheese_maker_id_fkey";
@@ -269,11 +267,11 @@ dream up.
 
 .. warning::
 
-   There's a reason this capability isn't documented; it's because we want to
-   give the argument signature for these ``on_delete`` functions a chance to
-   shake out before it's set in stone. So as of now there is no backwards
-   compatibility guarantee for this API: if you write a custom ``on_delete``
-   function, future Django versions might break it.
+   There's a reason this capability isn't documented; we want to give the
+   argument signature for these ``on_delete`` functions a chance to shake out
+   before it's set in stone. So as of now there is no backwards compatibility
+   guarantee for this API: if you write a custom ``on_delete`` function, future
+   Django versions might break it.
 
 Other benefits
 ==============
@@ -292,7 +290,7 @@ For example, in Django 1.2 if you had 100 cheesemakers in your database and
 called ``Cheesemaker.objects.all().delete()``, Django would do 100 separate
 queries on the ``Cheese`` table to look for cheeses related to each one of
 those cheesemakers. In Django 1.3, it will do a single bulk query on the cheese
-table.
+table; and similarly on down the chain of additional relationships.
 
 Clearer code
 ------------
@@ -306,5 +304,5 @@ The takeaway
 ============
 
 Django may not be a deletion framework, but deleting stuff in Django 1.3 is
-more flexible, faster, and all around less likely to make you a sad panda. What
-more could you want?
+more flexible, faster, and all around less likely to make you a sad
+panda. Enjoy!
