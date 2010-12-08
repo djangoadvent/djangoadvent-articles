@@ -8,7 +8,7 @@ day, and your site ins't especially complicated, it's easy to keep a
 handle on what is going on.
 
 However, the larger your site gets, the more important it is to get
-good diagnostic information. After all, you can't improve that what
+good diagnostic information. After all, you can't improve that which
 you don't measure, and you can't fix that which you can't diagnose.
 
 What's old?
@@ -24,7 +24,7 @@ you could set up mail filters to process incoming errors, but these
 can be painful to set up, and ultimately just give you more boxes, not
 any real insight.
 
-Using email as a raw reporting mechanism also leaves you as a victim
+Using email as a raw reporting mechanism also leaves you victim
 of the limitations of SMTP as a protocol. Any mail server outage means
 you could potentially lose error reports. If a high profile bug
 accidentally finds its way into production, you could find your inbox
@@ -58,11 +58,11 @@ How logging works
 -----------------
 
 The documentation for Python's logging framework makes logging seem a
-lot more complicated than it actually is. At it's core, logging is
+lot more complicated than it actually is. At its core, logging is
 actually quite simple.
 
 User space code decides it needs to log a message. This message can be
-given a severity, indicating it's importance, ranging from simple
+given a severity, indicating its importance, ranging from simple
 debug information, to critical errors that require urgent attention.
 The user writes the message to a logger, along with any metadata that
 might be useful, such as a stack trace or local variables.
@@ -71,8 +71,7 @@ The logger passes the message to a handler. The handler inspects the
 log message, and works out what to do with it -- write to a file, post
 to a network socket, or post it as an email. The decision on which
 handler to use is based on the severity of the message -- for example,
-low priority debug messages may be discarded entirely -- and on the
-specific logger that has been used.
+low priority debug messages may be discarded entirely.
 
 The handler can also take into account the specific logger that
 produced a message. A single project may have multiple loggers -- each
@@ -80,11 +79,11 @@ logger represents a bucket into which log messages can be directed.
 
 Along the way, the handler or the logger can optionally define the use
 of a filter. Filters provide a fine-grained way to determine whether a
-message will be handled, and to modify a message on route.
+message will be handled, and to modify a message en route.
 
 Finally, the handler needs to output the logging message. The format
 of the output can be configured using a Formatter. This formatter
-described exactly what information will be output by the handler, and
+describes exactly what information will be output by the handler, and
 the format. For example, will the log message include a date? If so,
 in what format will it be provided? Will it be written before or after
 the error code?
@@ -92,6 +91,8 @@ the error code?
 And that's it! And even with all these parts, your interaction with
 logging in user-space code will usually be little more than obtaining
 and logger and using it::
+
+.. sourcecode:: python
 
     import logging
 
@@ -105,6 +106,7 @@ and logger and using it::
             logger.error("We've had a problem")
         else:
             logger.info("Everything is groovy")
+
 
 Unleash the power!
 ------------------
@@ -217,7 +219,7 @@ What now?
 =========
 
 If you upgrade to Django 1.3, you don't need to make any changes to
-start using logging -- it's actually used by default for all Django's
+start using logging -- it's actually used by default for all of Django's
 error reporting actions that were previously hard coded. Django's 500
 handler doesn't just email errors to admins anymore. Instead, it
 passes the errors to a logger. The default logging configuration
