@@ -28,7 +28,9 @@ already is, of course - when you call it, you make a new instance of that
 class).
 
 This simple fact means that you can make views which are actually instances of
-classes, rather than functions, such as this simple example::
+classes, rather than functions, such as this simple example
+
+.. sourcecode:: python
 
     from django.http import HttpResponse
 
@@ -65,7 +67,9 @@ This is fine for simpler views, but even as you start getting remotely flexible
 a variety of options. This, for example, is the full function signature of
 ``object_detail``, a relatively simple view which takes a url like
 ``year/month/day/slug`` and shows you the item with a matching slug from
-a queryset::
+a queryset
+
+.. sourcecode:: python
 
     def object_detail(request, year, month, day, queryset, date_field,
         month_format='%b', day_format='%d', object_id=None, slug=None,
@@ -94,7 +98,9 @@ just set ``template_name`` to whatever we want [#]_.
 
 Examples speak louder than words in some cases; here's an example of overriding
 the class-based views equivalent of ``object_detail`` in the new system,
-a class called ``DateDetailView``::
+a class called ``DateDetailView``
+
+.. sourcecode:: python
 
     import datetime
     from django.views.generic.dates import DateDetailView
@@ -114,7 +120,9 @@ a class called ``DateDetailView``::
 You can see that it's very easy to provide arbitary new code paths at key
 decision points without copying-and-pasting the old function definition. In
 fact, class-based views make code reuse a very easy thing; here's the actual
-definition of that ``DateDetailView`` in the Django 1.3 source code::
+definition of that ``DateDetailView`` in the Django 1.3 source code
+
+.. sourcecode:: python
 
     class DateDetailView(SingleObjectTemplateResponseMixin, BaseDateDetailView):
         """
@@ -155,14 +163,18 @@ URLconfs
 Of course, there's a snag - there always is with any new way of doing things.
 In this case, it's how you refer to class-based views in the URLconfs.
 
-Previously, one referred to (function-based) views like so::
+Previously, one referred to (function-based) views like so
+
+.. sourcecode:: python
 
     urlpatterns = patterns('',
         (r'^awesome/$', 'advent.views.awesome')
     )
 
 Now, instead of using a string, you must import the class and use it directly
-instead, like so::
+instead, like so
+
+.. sourcecode:: python
 
     from advent.views import AwesomeView
     urlpatterns = patterns('',
