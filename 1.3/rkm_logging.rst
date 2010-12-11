@@ -90,7 +90,7 @@ the error code?
 
 And that's it! And even with all these parts, your interaction with
 logging in user-space code will usually be little more than obtaining
-and logger and using it::
+and logger and using it
 
 .. sourcecode:: python
 
@@ -147,7 +147,9 @@ you can also use filters to *transform* messages on their way to the
 handler. For example, Django logs 4XX series messages with a severity
 of INFO. If you want to make a special case of HTTP404 responses and
 log them as an error, you just write and install a filter that
-promotes those messages::
+promotes those messages
+
+.. sourcecode:: python
 
     class Error404Filter(logging.Filter):
         def filter(self, record):
