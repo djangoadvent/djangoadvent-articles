@@ -4,7 +4,7 @@ It's Log, Log, Log!
 
 
 A small site is easy to manage. If you only get a few hundred hits a
-day, and your site ins't especially complicated, it's easy to keep a
+day, and your site isn't especially complicated, it's easy to keep a
 handle on what is going on.
 
 However, the larger your site gets, the more important it is to get
@@ -238,7 +238,7 @@ capabilities of handlers, filters and formatters, and the various ways
 that logging can be configured.
 
 Once you've added logging to your Django projects, you can start using
-other tools to analyse the data contained in your logs. Tools like
+other tools to analyze the data contained in your logs. Tools like
 Nagios_, Arecibo_ or `Django Sentry`_ provide all manner of analysis
 and alerting features that can be used prioritize the errors and
 events that your site generates.
