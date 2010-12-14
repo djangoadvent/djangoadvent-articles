@@ -116,7 +116,7 @@ that these pieces can be used.
 
 You can create as many loggers as you want. Every logger has a name;
 this name ensures that a single logger can be shared between different
-code modules, or than a single code module can have multiple loggers.
+code modules, or that a single code module can have multiple loggers.
 
 Loggers are also hierarchical. The name used for loggers is a dotted
 path -- e.g., ``django.db.backends``. This dotted path is used to
@@ -240,7 +240,7 @@ that logging can be configured.
 Once you've added logging to your Django projects, you can start using
 other tools to analyze the data contained in your logs. Tools like
 Nagios_, Arecibo_ or `Django Sentry`_ provide all manner of analysis
-and alerting features that can be used prioritize the errors and
+and alerting features that can be used to prioritize the errors and
 events that your site generates.
 
 Logs aren't just `great as a snack`_ -- they're a great way to keep on
