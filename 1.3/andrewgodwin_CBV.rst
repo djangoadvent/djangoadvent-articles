@@ -117,7 +117,7 @@ a class called ``DateDetailView``
             else:
                 return super(MyDateDetailView, self).get_year()
 
-You can see that it's very easy to provide arbitary new code paths at key
+You can see that it's very easy to provide arbitrary new code paths at key
 decision points without copying-and-pasting the old function definition. In
 fact, class-based views make code reuse a very easy thing; here's the actual
 definition of that ``DateDetailView`` in the Django 1.3 source code
@@ -145,13 +145,13 @@ eventual inflexibility (there's only so many options one can add in the
 function signature before it becomes ridiculous) meant that a lot of developers
 simply ignored them.
 
-There's also no need to use these specific views, like ``DateDetailView`` _[#].
+There's also no need to use these specific views, like ``DateDetailView`` [#]_.
 There are basic ``View`` and ``TemplateView`` methods, which provide
 method-based dispatch (so you can write GET, POST and DELETE as separate
 methods) and standard template-rendering code respectively (a lot of views need
 only inherit from ``TemplateView`` and define ``template_name`` and
 ``get_context_data``). The request and positional/keyword URL arguments are
-also available on ``self`` _[#], so there's no need to pass them around.
+also available on ``self`` [#]_, so there's no need to pass them around.
 
 .. [#] In fact, all the new class-based generic views come in a BaseXView and an XView variant - the Base version is if you want to use some of the methods without that view's specific rendering logic.
 
@@ -186,13 +186,13 @@ Some of you may think that this is a step backwards (particularly the
 ``as_view()`` bit), but there are good reasons for the decision, revolving
 around thread-safety, not breaking normal Python idioms, and keeping it
 relatively user-friendly. If you're interested, there was a thread with over
-200 posts on django-developers; it makes good bedtime reading _[#].
+200 posts on django-developers; it makes good bedtime reading [#]_.
 
 .. [#] It's also one of several threads on the topic; nothing else in recent years has caused as much debate about small implementation details, especially when there's three competing proposals which all have some merit.
 
 Nevertheless, in the end a decision was reached, and ``as_view()`` is the
 result. It's relatively easy to understand - it returns a new function which,
-when called, makes a new class instance, calls ``dispatch()`` _[#] on that
+when called, makes a new class instance, calls ``dispatch()`` [#]_ on that
 class with the request, and returns the response. There is, ironically, no use
 of ``__call__`` in the final version of class-based views, but it's certainly
 what inspired them in the first place.
