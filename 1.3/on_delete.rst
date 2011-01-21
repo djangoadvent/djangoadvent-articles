@@ -120,15 +120,15 @@ cheesemaker's guild, no doubt). Here's how we could do that::
         favorite_cheese = models.ForeignKey("Cheese", on_delete=models.PROTECT)
 
 Now, if we try to delete any cheese that is referenced as ``favorite_cheese``
-from any cheesemaker, Django will actually raise ``IntegrityError`` and prevent
-the deletion from occurring.
+from any cheesemaker, Django will actually raise ``ProtectedError`` (a subclass
+of ``IntegrityError`` and prevent the deletion from occurring.
 
 .. warning::
 
    If you use ``PROTECT`` ForeignKeys, you are responsible to clear out any
    relevant relationships before attempting a delete, and/or catch
-   ``IntegrityError`` from the ``delete()`` call. If your code allows the
-   ``IntegrityError`` to go uncaught, it will result in a 500 Internal Server
+   ``ProtectedError`` from the ``delete()`` call. If your code allows the
+   ``ProtectedError`` to go uncaught, it will result in a 500 Internal Server
    Error response from your application; bad news.
 
 SET_DEFAULT
