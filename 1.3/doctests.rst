@@ -21,6 +21,7 @@ Yes.  They really are that evil.
 
 They obscure errors
 -------------------
+
 By default when a doctest hits a failure it'll keep on going, rather than stop
 there, like normal code does.  This results in exceptionally long error
 messages that you have to scroll through, looking for the root of your issues:
@@ -117,25 +118,27 @@ give you:
        6 of   6 in test
     ***Test Failed*** 6 failures.
 
-Good luck debugging any of that.  If that wasn't bad enough, this is compounded by the fact that doctests don't support any of the usual mechanisms for splitting up your code.  Where with a unittest you'd have a dozen individual tests, in a
-doctest you basically have to make them all part of one test, because you don't
-have ``setUp()``, ``tearDown()``, or ``fixtures`` support.
+Good luck debugging any of that.  If that wasn't bad enough, this is compounded
+by the fact that doctests don't support any of the usual mechanisms for
+splitting up your code.  Where with a unittest you'd have a dozen individual
+tests, in a doctest you basically have to make them all part of one test,
+because you don't have ``setUp()``, ``tearDown()``, or ``fixtures`` support.
 
 They're stupid strings
 ----------------------
 
-Meaning your editor doesnt't syntax highlight them and tools like ``pyflakes``
-or ``pylint`` can't analyze them.  That is every tool you have at your disposal
-for understanding your code is rendered useless.  Ever noticed a bug while
-programming because your editor didn't syntax highlight a keyword because you'd
-typo'd it?  I have, quite a few times actually.  Not once while writing a
-doctest though.  I usually found out about those in the middle of 7000 line
-error messages.
+Meaning your editor doesn't syntax highlight them and tools like ``pyflakes``
+or ``pylint`` can't analyze them.  That is, every tool you normally have at
+your disposal for understanding your code is rendered useless.  Ever noticed a
+bug while programming because your editor didn't syntax highlight a keyword
+because you'd typo'd it?  I have, quite a few times actually.  Not once while
+writing a doctest though.  I usually found out about those in the middle of
+7000 line error messages.
 
 They encourage weak assertions
 ------------------------------
 
-Give a test like:
+Given a test like:
 
 .. sourcecode:: python
 
@@ -152,9 +155,9 @@ check.  Compare that to:
 
     self.assertEqual(a, 8)
 
-Which actually does check that ``a == 8``.  This doesn't affect 99% of code,
+Which actually does check that ``a == 8``.  This doesn't affect 99% of code;
 how often do you have an object that's incorrect, but that also has a matching
-``repr()``?  Probably not that often, on the other hand if that ever happens
+``repr()``?  Probably not that often. On the other hand, if that ever happens
 when you're writing a doctest you'll probably spend the next 6 weeks trying to
 debug it.
 
@@ -195,7 +198,7 @@ massive speedups to the Django test suite.
 
 
 I don't know about you, but I was convinced after the first point.  7000 lines
-of traceback for 1 line of failure sucks.  But readability, debugability,
+of traceback for 1 line of failure sucks.  But readability, debug-ability,
 speed, and tooling all from one patch?  SOLD!
 
 Seeing the light
@@ -208,7 +211,7 @@ killed a doctest.
 doctests and you
 ================
 
-Your company has a nice big test suite (it does have a test suite, right?), if
+Your company has a nice big test suite (it does have a test suite, right?). If
 you started it a long time ago it probably has a bunch of doctests.  Should you
 convert them all?  Yes.  It doesn't have to happen all at once, but in the long
 run you must kill all of your doctests, preferably in the most brutal fashion
