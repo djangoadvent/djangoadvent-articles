@@ -218,3 +218,11 @@ run you must kill all of your doctests, preferably in the most brutal fashion
 imaginable.  Every time you start to write a new test, convert a few doctests
 from the file you're working in.  It won't be too long until you're killed them
 all.
+
+Is there a time and a place for doctests?
+=========================================
+
+I've been hard on doctests, I've compared them to Satan (and they didn't come
+out favorably), however there is one time and place for doctests: as
+documentation that happen to be executable.  When in doubt remember the golden
+rule: doctests are docs first, and tests never.
